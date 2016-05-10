@@ -62,8 +62,22 @@ public class ObservableRecyclerView implements Observer {
       @Override
       public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         if (mOnScrollListener != null) {
+          final int verticalScrollOffset;
+
+          RecyclerView.LayoutManager manager = mRecyclerView.getLayoutManager();
+          if (manager instanceof LinearLayoutManager) {
+            RecyclerView.ViewHolder viewHolder = mRecyclerView.findViewHolderForAdapterPosition(0);
+            if (viewHolder != null) {
+              verticalScrollOffset = mRecyclerView.getPaddingTop() - viewHolder.itemView.getTop();
+            } else {
+              verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
+            }
+          } else {
+            verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
+          }
+          
           mOnScrollListener.onScrollChanged(recyclerView,
-              recyclerView.computeHorizontalScrollOffset(), recyclerView.computeVerticalScrollOffset(),
+              recyclerView.computeHorizontalScrollOffset(), verticalScrollOffset,
               dx, dy,
               recyclerView.getLayoutManager().findViewByPosition(HEADER_VIEW_POSITION) != null);
         }
